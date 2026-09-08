@@ -1,0 +1,51 @@
+# Конфигурация упаковки в исполняемое приложение (electron-builder).
+# Собирается ровно то, что лежит в out/ после `npm run build` — сам
+# electron-vite здесь не запускается, поэтому npm-скрипты всегда делают
+# сначала build, потом упаковку (см. package.json).
+
+appId: com.isaacmodbuilder.app
+productName: Isaac Mod Builder
+copyright: ""
+
+directories:
+  output: dist
+  buildResources: build
+
+# В пакет кладём только собранный код и манифест. Исходники src/ и electron/
+# внутрь не нужны: приложение стартует с out/main/index.js (поле main).
+files:
+  - out/**/*
+  - package.json
+
+# Нативных зависимостей в проекте нет (react/zustand — чистый JS), поэтому
+# пересборка под целевую платформу не нужна и только замедляет упаковку.
+npmRebuild: false
+
+win:
+  # Правка метаданных .exe (иконка, название, версия) и подпись делаются
+  # утилитой rcedit, а она под Linux запускается только через Wine. Без этого
+  # флага кросс-сборка Windows-версии с Linux падает с "wine is required".
+  # Ценой отключения .exe остаётся с иконкой и метаданными Electron по
+  # умолчанию — на работу приложения это не влияет. Собирайте на Windows
+  # (или поставьте wine), если нужны свои иконка и свойства файла.
+  signAndEditExecutable: false
+  # zip — единственная Windows-цель, которая собирается С LINUX без Wine:
+  # пользователь распаковывает архив и запускает "Isaac Mod Builder.exe".
+  # Цели nsis (Setup.exe) и portable требуют Wine — они собираются либо на
+  # самой Windows (npm run dist:win), либо на Linux с установленным wine.
+  # Чтобы собрать их, добавьте сюда: - target: nsis / - target: portable
+  target:
+    - target: zip
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+linux:
+  target:
+    - AppImage
+  category: Development
