@@ -92,7 +92,7 @@ export function createTrinket(overrides = {}) {
   return {
     id: makeId('trinket'),
     kind: 'trinket',
-    name: 'Новый трюк',
+    name: 'Новый тринкет',
     description: '',
     iconSpriteId: null,
     goldenAllowed: true,
